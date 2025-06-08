@@ -1,0 +1,2 @@
+# edulu
+Proyecto personal edulu 
