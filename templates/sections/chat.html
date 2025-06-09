@@ -1,57 +1,88 @@
-<style>
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <style>
+    /* Estilos del scrollbar */
+    .chat-messages::-webkit-scrollbar {
+      width: 8px;
     }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #a855f7;
+    .chat-messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
       border-radius: 4px;
     }
 
-    .custom-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: #a855f7 transparent;
+    .chat-messages::-webkit-scrollbar-thumb {
+      background-color: #6366f1;
+      border-radius: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background-color: #4f46e5;
+    }
+
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-out;
     }
   </style>
 </head>
-<body class="bg-gradient-to-b from-[#e5e7eb] to-[#f4f4f8] min-h-screen overflow-hidden">
+<body>
+  <section id="chat-section" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-[#e5e7eb] to-[#f4f4f8]">
+    <div class="w-full max-w-2xl">
+      <!-- Encabezado -->
+      <div class="text-center mb-8 fade-in">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">¿No sabes qué estudiar?</h1>
+        <p class="text-lg text-gray-700">Cuéntanos sobre ti y nuestra IA te recomendará las mejores universidades del Perú según tu perfil.</p>
+      </div>
 
-<section id="chat-section" class="relative min-h-screen flex flex-col items-center justify-center text-center px-4 bg-gradient-to-b from-[#e5e7eb] to-[#f4f4f8] overflow-hidden">
-  <div id="particles-js"></div>
-  <svg class="orbit-bg animate-[pulse_14s_ease-in-out_infinite]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-    <g fill="#6366f1" opacity="0.2">
-      <polygon points="200,150 220,180 240,150 220,120" />
-      <polygon points="400,300 430,320 400,340 370,320" />
-    </g>
-    <g fill="#a855f7" opacity="0.15">
-      <polygon points="100,450 130,470 100,490 70,470" />
-      <polygon points="600,100 620,130 640,100 620,70" />
-    </g>
-  </svg>
+      <!-- Contenedor principal del chat -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col" style="height: 520px;">
+        <!-- Área de chat con scroll y altura fija -->
+        <div id="respuesta" class="chat-messages flex-1 overflow-y-auto p-6 text-gray-800 space-y-4" style="min-height:0;">
+          <!-- Las respuestas aparecerán aquí -->
+        </div>
 
-  <div class="relative z-10 flex flex-col items-center w-full max-w-2xl bg-white/70 backdrop-blur-md rounded-xl shadow-xl p-8">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4">¿No sabes qué estudiar?</h1>
-    <p class="text-lg md:text-xl mb-6 text-gray-800">Cuéntanos sobre ti y nuestra IA te recomendará las mejores universidades del Perú según tu perfil.</p>
+        <!-- Separador -->
+        <div class="h-px bg-gray-200"></div>
 
-    <!-- Campo de entrada -->
-    <div class="flex w-full items-center gap-2 mb-4">
-      <input id="input-mensaje" type="text" placeholder="Ej: Me gusta medicina y quiero estudiar en Trujillo"
-        class="flex-grow px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-      <button id="btn-recomendar"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition-all">Enviar</button>
-    </div>
+        <!-- Área de entrada -->
+        <div class="p-4 bg-gray-50">
+          <div class="flex gap-2">
+            <input 
+              id="input-mensaje" 
+              type="text" 
+              placeholder="Ej: Me gusta medicina y quiero estudiar en Trujillo"
+              class="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            <button 
+              id="btn-recomendar"
+              class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      </div>
 
-    <!-- Contenedor limitado para mantener el scroll visible -->
-    <div class="w-full max-h-[350px] overflow-hidden">
-      <div id="respuesta"
-        class="h-full overflow-y-auto overflow-x-hidden text-left text-gray-900 bg-white border border-gray-200 rounded-lg px-4 py-3 space-y-4 shadow-inner leading-relaxed text-sm md:text-base whitespace-pre-line custom-scrollbar">
-        <!-- Las respuestas del chat aparecerán aquí -->
+      <!-- Loader -->
+      <div id="loader" class="mt-4 text-center text-indigo-600 hidden">
+        <div class="inline-flex items-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Edulu está pensando...
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- Loader oculto por defecto -->
-    <div id="loader" class="mt-4 hidden text-sm text-indigo-500 animate-pulse">Edulu está pensando...</div>
-  </div>
-</section>
-
-<script src="/static/js/chat.js"></script>
+  <script src="/static/js/chat.js"></script>
+</body>
+</html>
