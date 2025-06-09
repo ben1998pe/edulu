@@ -1,0 +1,25 @@
+Listado de rutas de carpetas
+El n£mero de serie del volumen es E8D6-667F
+C:.
+³   .env
+³   app.py
+³   carreras_completas.json
+³   estructura.txt
+³   README.md
+³   
+ÃÄÄÄstatic
+³   ÃÄÄÄcss
+³   ÀÄÄÄjs
+³           buscador.js
+³           chat.js
+³           main.js
+³           mapa.js
+³           
+ÀÄÄÄtemplates
+    ³   index.html
+    ³   
+    ÀÄÄÄsections
+            buscador.html
+            chat.html
+            mapa.html
+            
