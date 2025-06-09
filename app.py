@@ -30,6 +30,47 @@ ciudad_to_region = {
     # Agrega más si es necesario
 }
 
+# Diccionario robusto de ciudades principales de Perú con coordenadas
+ciudades_coords = {
+    "Lima": [-12.0464, -77.0428],
+    "Arequipa": [-16.4090, -71.5375],
+    "Trujillo": [-8.11599, -79.02898],
+    "Chiclayo": [-6.7714, -79.8409],
+    "Piura": [-5.1945, -80.6328],
+    "Cusco": [-13.5319, -71.9675],
+    "Iquitos": [-3.7437, -73.2516],
+    "Huancayo": [-12.0651, -75.2049],
+    "Tacna": [-18.0066, -70.2463],
+    "Ica": [-14.0678, -75.7286],
+    "Pucallpa": [-8.3791, -74.5539],
+    "Juliaca": [-15.4997, -70.1333],
+    "Chimbote": [-9.0745, -78.5936],
+    "Ayacucho": [-13.1588, -74.2232],
+    "Cajamarca": [-7.1617, -78.5127],
+    "Puno": [-15.8402, -70.0219],
+    "Tumbes": [-3.5669, -80.4515],
+    "Tarapoto": [-6.4836, -76.3756],
+    "Huaraz": [-9.5278, -77.5278],
+    "Puerto Maldonado": [-12.5933, -69.1891],
+    "Moquegua": [-17.1927, -70.9326],
+    "Huánuco": [-9.9306, -76.2422],
+    "Sullana": [-4.9039, -80.6851],
+    "Chincha Alta": [-13.4196, -76.1367],
+    "Abancay": [-13.6339, -72.8814],
+    "Huaral": [-11.4956, -77.2076],
+    "Cerro de Pasco": [-10.6827, -76.2567],
+    "Moyobamba": [-6.0346, -76.9716],
+    "Jaén": [-5.7081, -78.8087],
+    "Huacho": [-11.1075, -77.6050],
+    "Pisco": [-13.7103, -76.2032],
+    "Tarma": [-11.4196, -75.6906],
+    "Yurimaguas": [-5.9028, -76.1194],
+    "Bagua": [-5.6366, -78.5370],
+    "Sicuani": [-14.2722, -71.2261],
+    "La Oroya": [-11.5261, -75.8925],
+    # ... puedes agregar más ciudades según necesidad ...
+}
+
 def normalizar(texto):
     texto = texto.lower()
     texto = unicodedata.normalize("NFKD", texto)
@@ -94,6 +135,46 @@ def recomendar():
     except Exception as e:
         print("❌ Error en /recomendar:", e)
         return jsonify({"respuesta": "⚠️ Error: No se pudo obtener respuesta de la IA."})
+
+@app.route("/carreras", methods=["GET"])
+def obtener_carreras():
+    carreras = list(carreras_data.keys())
+    return jsonify({"carreras": carreras})
+
+@app.route("/universidades_por_carrera", methods=["GET"])
+def universidades_por_carrera():
+    carrera = request.args.get("carrera")
+    if not carrera:
+        return jsonify({"error": "Falta el parámetro 'carrera'"}), 400
+    carrera_normalizada = normalizar(carrera)
+    resultados = {}
+    for nombre, lista in carreras_data.items():
+        if carrera_normalizada == normalizar(nombre):
+            for inst in lista:
+                ciudad = inst.get("Ciudad", "").strip()
+                if ciudad not in ciudades_coords:
+                    continue  # Solo ciudades conocidas
+                if ciudad not in resultados:
+                    resultados[ciudad] = {
+                        "coords": ciudades_coords[ciudad],
+                        "universidades": []
+                    }
+                resultados[ciudad]["universidades"].append({
+                    "nombre": inst.get("Institución", ""),
+                    "carrera": inst.get("Carrera", ""),
+                    "costo_anual": inst.get("Costo anual", ""),
+                    "duracion": inst.get("Duración", ""),
+                    "web": inst.get("Página web", "")
+                })
+    # Convertir a lista para el frontend
+    ciudades = []
+    for ciudad, data in resultados.items():
+        ciudades.append({
+            "ciudad": ciudad,
+            "coords": data["coords"],
+            "universidades": data["universidades"]
+        })
+    return jsonify({"ciudades": ciudades})
 
 if __name__ == "__main__":
     app.run(debug=True)
