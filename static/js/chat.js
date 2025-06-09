@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const inputMensaje = document.getElementById("input-mensaje");
   const btnRecomendar = document.getElementById("btn-recomendar");
   const respuestaDiv = document.getElementById("respuesta");
+  const chatExpandable = document.getElementById("chat-expandable");
 
   // ✍️ Efecto máquina de escribir
   function escribirConEfecto(texto, contenedor, delay = 20) {
@@ -52,6 +53,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (data.respuesta) {
         escribirConEfecto(data.respuesta, eduluSpan);
+        // Expande el chat solo la primera vez que llega una respuesta
+        if (chatExpandable && !chatExpandable.classList.contains('expanded')) {
+          chatExpandable.classList.add('expanded');
+        }
       } else {
         eduluSpan.innerText = `⚠️ Error: ${data.error || "No se pudo obtener respuesta."}`;
       }
