@@ -1,37 +1,75 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const boton = document.getElementById("btn-recomendar");
-  const input = document.getElementById("input-mensaje");
-  const respuestaContenedor = document.getElementById("respuesta");
+document.addEventListener("DOMContentLoaded", function () {
+  const inputMensaje = document.getElementById("input-mensaje");
+  const btnRecomendar = document.getElementById("btn-recomendar");
+  const respuestaDiv = document.getElementById("respuesta");
 
-  boton.addEventListener("click", async () => {
-    const mensaje = input.value.trim();
-
-    if (!mensaje) {
-      respuestaContenedor.innerText = "Por favor, escribe algo para que la IA te recomiende.";
-      return;
+  // ✍️ Efecto máquina de escribir
+  function escribirConEfecto(texto, contenedor, delay = 20) {
+    contenedor.innerHTML = "";
+    let i = 0;
+    function escribir() {
+      if (i < texto.length) {
+        contenedor.innerHTML += texto[i] === "\n" ? "<br>" : texto[i];
+        i++;
+        setTimeout(escribir, delay);
+        respuestaDiv.scrollTop = respuestaDiv.scrollHeight; // scroll mientras escribe
+      }
     }
+    escribir();
+  }
 
-    respuestaContenedor.innerText = "⏳ Pensando...";
+  // 🚀 Solicita recomendación
+  async function obtenerRecomendacion() {
+    const mensaje = inputMensaje.value.trim();
+    if (!mensaje) return;
+
+    // Mostrar mensaje del usuario
+    const userParrafo = document.createElement("p");
+    userParrafo.innerHTML = `<strong>Tú:</strong> ${mensaje}`;
+    respuestaDiv.appendChild(userParrafo);
+
+    // Crear contenedor de Edulu
+    const eduluParrafo = document.createElement("p");
+    const eduluLabel = document.createElement("strong");
+    eduluLabel.textContent = "Edulu: ";
+    const eduluSpan = document.createElement("span");
+
+    eduluParrafo.appendChild(eduluLabel);
+    eduluParrafo.appendChild(eduluSpan);
+    respuestaDiv.appendChild(eduluParrafo);
+    respuestaDiv.scrollTop = respuestaDiv.scrollHeight;
+
+    inputMensaje.value = "";
 
     try {
-      const response = await fetch("/recomendar", {
+      const res = await fetch("/recomendar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mensaje }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
       if (data.respuesta) {
-        respuestaContenedor.innerText = data.respuesta;
-      } else if (data.error) {
-        respuestaContenedor.innerText = "⚠️ Error: " + data.error;
+        escribirConEfecto(data.respuesta, eduluSpan);
       } else {
-        respuestaContenedor.innerText = "❌ No se obtuvo una respuesta válida.";
+        eduluSpan.innerText = `⚠️ Error: ${data.error || "No se pudo obtener respuesta."}`;
       }
-    } catch (error) {
-      console.error("Error al consultar a la IA:", error);
-      respuestaContenedor.innerText = "❌ Error al consultar a la IA.";
+    } catch (err) {
+      eduluSpan.innerText = "⚠️ Error de red.";
+    }
+  }
+
+  // 📥 Listeners
+  btnRecomendar.addEventListener("click", (e) => {
+    e.preventDefault();
+    obtenerRecomendacion();
+  });
+
+  inputMensaje.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      obtenerRecomendacion();
     }
   });
 });

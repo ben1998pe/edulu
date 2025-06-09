@@ -1,5 +1,22 @@
-<!-- Sección 1: Chat IA -->
-<section id="chat-section" class="relative h-screen flex flex-col items-center justify-center text-center px-4 bg-gradient-to-b from-[#e5e7eb] to-[#f4f4f8] overflow-hidden">
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #a855f7;
+      border-radius: 4px;
+    }
+
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #a855f7 transparent;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-[#e5e7eb] to-[#f4f4f8] min-h-screen overflow-hidden">
+
+<section id="chat-section" class="relative min-h-screen flex flex-col items-center justify-center text-center px-4 bg-gradient-to-b from-[#e5e7eb] to-[#f4f4f8] overflow-hidden">
   <div id="particles-js"></div>
   <svg class="orbit-bg animate-[pulse_14s_ease-in-out_infinite]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
     <g fill="#6366f1" opacity="0.2">
@@ -12,14 +29,28 @@
     </g>
   </svg>
 
-  <div class="relative z-10 flex flex-col items-center max-w-xl">
-    <h1 class="text-4xl md:text-6xl font-bold mb-6 fade-in">¿No sabes qué estudiar?</h1>
-    <p class="text-lg md:text-2xl mb-8 fade-in">Cuéntanos sobre ti y nuestra IA te recomendará las mejores universidades del Perú según tu perfil.</p>
+  <div class="relative z-10 flex flex-col items-center w-full max-w-2xl bg-white/70 backdrop-blur-md rounded-xl shadow-xl p-8">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">¿No sabes qué estudiar?</h1>
+    <p class="text-lg md:text-xl mb-6 text-gray-800">Cuéntanos sobre ti y nuestra IA te recomendará las mejores universidades del Perú según tu perfil.</p>
 
-    <input id="input-mensaje" type="text" placeholder="Me gusta la ingeniería, quiero estudiar en Lima..." class="w-full px-4 py-2 rounded-lg shadow mb-4 border" />
-    <button id="btn-recomendar" class="bg-indigo-500 hover:bg-indigo-700 text-white py-2 px-6 rounded-full transition-all duration-300 fade-in">Recomendar</button>
+    <!-- Campo de entrada -->
+    <div class="flex w-full items-center gap-2 mb-4">
+      <input id="input-mensaje" type="text" placeholder="Ej: Me gusta medicina y quiero estudiar en Trujillo"
+        class="flex-grow px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <button id="btn-recomendar"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition-all">Enviar</button>
+    </div>
 
-    <div id="respuesta" class="mt-6 text-lg text-gray-700"></div>
+    <!-- Contenedor limitado para mantener el scroll visible -->
+    <div class="w-full max-h-[350px] overflow-hidden">
+      <div id="respuesta"
+        class="h-full overflow-y-auto overflow-x-hidden text-left text-gray-900 bg-white border border-gray-200 rounded-lg px-4 py-3 space-y-4 shadow-inner leading-relaxed text-sm md:text-base whitespace-pre-line custom-scrollbar">
+        <!-- Las respuestas del chat aparecerán aquí -->
+      </div>
+    </div>
+
+    <!-- Loader oculto por defecto -->
+    <div id="loader" class="mt-4 hidden text-sm text-indigo-500 animate-pulse">Edulu está pensando...</div>
   </div>
 </section>
 
