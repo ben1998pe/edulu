@@ -58,7 +58,24 @@ window.addEventListener('DOMContentLoaded', async () => {
             const marker = L.marker(ciudad.coords).addTo(leafletMap);
             leafletMarkers.push(marker);
             // Crear popup con la lista de universidades
-            let popupHtml = `<button class='text-indigo-600 underline bg-white px-2 py-1 rounded' onclick='window.mostrarPanelUniversidades && window.mostrarPanelUniversidades(${JSON.stringify(ciudad.ciudad)}, ${JSON.stringify(ciudad.universidades)})'>Ver universidades</button>`;
+            let popupHtml = `
+              <div class='popup-glass animate-popup-wow p-3 rounded-xl shadow-xl border border-indigo-100 bg-white/80 backdrop-blur-md flex flex-col items-center' style='min-width:170px; position:relative;'>
+                <button class='ver-universidades-btn flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold shadow transition-all duration-200' style='font-size:1rem;' onclick='window.mostrarPanelUniversidades && window.mostrarPanelUniversidades(${JSON.stringify(ciudad.ciudad)}, ${JSON.stringify(ciudad.universidades)})'>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                  Ver universidades
+                </button>
+              </div>
+              <style>
+                .popup-glass { box-shadow: 0 8px 32px 0 rgba(99,102,241,0.18); border: 1.5px solid #a5b4fc; }
+                .animate-popup-wow { animation: popupWow 0.5s cubic-bezier(.68,-0.55,.27,1.55); }
+                @keyframes popupWow {
+                  0% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+                  80% { opacity: 1; transform: translateY(5px) scale(1.03); }
+                  100% { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                .ver-universidades-btn:active { transform: scale(0.97); }
+              </style>
+            `;
             marker.bindPopup(popupHtml);
           });
           // Ajustar vista a los marcadores si hay alguno
@@ -134,13 +151,26 @@ function mostrarPanelUniversidades(ciudad, universidades) {
   universidades.forEach(u => {
     const div = document.createElement('div');
     div.className = 'p-3 bg-gray-50 rounded-xl border border-gray-200 shadow min-h-28 flex flex-col justify-between mx-2';
-    div.innerHTML = `<b>${u.nombre}</b><br/><span class='text-sm text-gray-700'>${u.carrera}</span>` +
-      (u.web ? `<br/><a href='${u.web}' target='_blank' class='text-indigo-600 underline'>Sitio web</a>` : '') +
-      (u.costo_anual ? `<br/><span class='text-xs text-gray-500'>Costo anual: ${u.costo_anual}</span>` : '') +
-      (u.duracion ? `<br/><span class='text-xs text-gray-500'>Duración: ${u.duracion}</span>` : '');
+    let logoHtml = '';
+    if (u.web) {
+      try {
+        const url = new URL(u.web);
+        const dominio = url.hostname.replace(/^www\./, '');
+        logoHtml = `<div class='flex justify-center'><img src='https://img.logo.dev/${dominio}?token=pk_JIk4mA1YTwKncwOGjTCLug&retina=true' alt='Logo' width='44' height='44' class='mb-1 rounded' style='object-fit:contain;max-height:44px;max-width:44px;display:block;' onerror="this.onerror=null;this.src='https://img.logo.dev/logo.dev?token=pk_JIk4mA1YTwKncwOGjTCLug&retina=true';"></div>`;
+      } catch(e) {
+        logoHtml = `<div class='flex justify-center'><img src='https://img.logo.dev/logo.dev?token=pk_JIk4mA1YTwKncwOGjTCLug&retina=true' alt='Logo' width='44' height='44' class='mb-1 rounded' style='object-fit:contain;max-height:44px;max-width:44px;display:block;'></div>`;
+      }
+    } else {
+      logoHtml = `<div class='flex justify-center'><img src='https://img.logo.dev/logo.dev?token=pk_JIk4mA1YTwKncwOGjTCLug&retina=true' alt='Logo' width='44' height='44' class='mb-1 rounded' style='object-fit:contain;max-height:44px;max-width:44px;display:block;'></div>`;
+    }
+    div.innerHTML = logoHtml + `<b class='block text-center'>${u.nombre}</b><span class='block text-sm text-gray-700 text-center'>${u.carrera}</span>` +
+      (u.web ? `<br/><a href='${u.web}' target='_blank' class='text-indigo-600 underline block text-center'>Sitio web</a>` : '') +
+      (u.costo_anual ? `<br/><span class='text-xs text-gray-500 block text-center'>Costo anual: ${u.costo_anual}</span>` : '') +
+      (u.duracion ? `<br/><span class='text-xs text-gray-500 block text-center'>Duración: ${u.duracion}</span>` : '');
     lista.appendChild(div);
   });
   panel.style.display = 'block';
+  panel.classList.add('animate-panel-wow');
   document.body.classList.add('overflow-hidden');
   setTimeout(() => panel.classList.remove('translate-y-full'), 10);
 
@@ -167,14 +197,33 @@ function mostrarPanelUniversidades(ciudad, universidades) {
       ]
     });
   }, 100);
+
+  // Mostrar overlay
+  const overlay = document.getElementById('panel-overlay');
+  if (overlay) {
+    overlay.style.display = 'block';
+    setTimeout(() => {
+      overlay.classList.remove('opacity-0', 'pointer-events-none');
+      overlay.classList.add('opacity-100');
+    }, 10);
+  }
 }
 
 function ocultarPanelUniversidades() {
   const panel = document.getElementById('panel-universidades');
   if (!panel) return;
   panel.classList.add('translate-y-full');
+  panel.classList.remove('animate-panel-wow');
   document.body.classList.remove('overflow-hidden');
   setTimeout(() => { panel.style.display = 'none'; }, 300);
+
+  // Ocultar overlay
+  const overlay = document.getElementById('panel-overlay');
+  if (overlay) {
+    overlay.classList.remove('opacity-100');
+    overlay.classList.add('opacity-0', 'pointer-events-none');
+    setTimeout(() => { overlay.style.display = 'none'; }, 300);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
