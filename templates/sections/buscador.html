@@ -1,70 +1,44 @@
-  <!-- Sección 3: Buscador con filtros -->
-  <section id="search-section" class="relative min-h-screen bg-gradient-to-b from-[#e5e7eb] to-[#f4f4f8] px-4 py-20 overflow-hidden">
-    <svg class="orbit-bg animate-[pulse_20s_ease-in-out_infinite]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-      <g fill="#6366f1" opacity="0.2">
-        <polygon points="200,100 230,120 200,140 170,120" />
-        <polygon points="400,300 430,320 400,340 370,320" />
-      </g>
-      <g fill="#9333ea" opacity="0.15">
-        <polygon points="600,200 620,230 640,200 620,170" />
-        <polygon points="150,450 170,480 190,450 170,420" />
-      </g>
-    </svg>
-
-    <h2 class="text-3xl md:text-5xl font-bold text-center mb-12 fade-in relative z-10">Busca por filtros</h2>
-
-    <div class="max-w-6xl mx-auto space-y-12 relative z-10">
-      <!-- Filtros -->
-      <div class="grid md:grid-cols-3 gap-6 fade-in">
-        <input type="text" placeholder="Buscar carrera..." class="w-full px-5 py-3 rounded-xl bg-white text-black shadow focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <input type="text" placeholder="Ciudad..." class="w-full px-5 py-3 rounded-xl bg-white text-black shadow focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <select class="w-full px-5 py-3 rounded-xl bg-white text-black shadow focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option disabled selected>Modalidad</option>
-          <option>Presencial</option>
-          <option>Online</option>
+<!-- Sección de Búsqueda Avanzada -->
+<section id="buscador" class="py-16 bg-gradient-to-b from-white to-indigo-50">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">Buscador Avanzado</h2>
+    
+    <!-- Filtros -->
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Filtro de Carrera -->
+        <div class="relative">
+          <input type="text" id="carreraInput" placeholder="Buscar carrera..." 
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-300">
+          <div id="sugerenciasCarrera" class="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 hidden"></div>
+        </div>
+        
+        <!-- Filtro de Ciudad -->
+        <div class="relative">
+          <input type="text" id="ciudadInput" placeholder="Buscar ciudad..." 
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-300">
+          <div id="sugerenciasCiudad" class="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 hidden"></div>
+        </div>
+        
+        <!-- Filtro de Tipo -->
+        <select id="tipoInput" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-300">
+          <option value="">Todas las instituciones</option>
+          <option value="Universidad">Universidades</option>
+          <option value="Instituto">Institutos</option>
         </select>
       </div>
-
-      <!-- Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 fade-in">
-        <div class="bg-white text-black rounded-2xl p-6 shadow-xl transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-          <div class="mb-4">
-            <h3 class="text-2xl font-bold mb-1">Universidad de Lima</h3>
-            <span class="text-sm text-indigo-600 font-semibold">Psicología</span>
-          </div>
-          <ul class="text-sm space-y-1 text-gray-700">
-            <li><strong>Ciudad:</strong> Lima</li>
-            <li><strong>Modalidad:</strong> Presencial</li>
-            <li><strong>Duración:</strong> 5 años</li>
-          </ul>
-          <button class="mt-6 w-full py-2 px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-semibold transition-all duration-300">Ver más</button>
-        </div>
-
-        <div class="bg-white text-black rounded-2xl p-6 shadow-xl transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-          <div class="mb-4">
-            <h3 class="text-2xl font-bold mb-1">PUCP</h3>
-            <span class="text-sm text-indigo-600 font-semibold">Ingeniería Informática</span>
-          </div>
-          <ul class="text-sm space-y-1 text-gray-700">
-            <li><strong>Ciudad:</strong> Nacional</li>
-            <li><strong>Modalidad:</strong> Online</li>
-            <li><strong>Duración:</strong> 5 años</li>
-          </ul>
-          <button class="mt-6 w-full py-2 px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-semibold transition-all duration-300">Ver más</button>
-        </div>
-
-        <div class="bg-white text-black rounded-2xl p-6 shadow-xl transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-          <div class="mb-4">
-            <h3 class="text-2xl font-bold mb-1">Universidad San Marcos</h3>
-            <span class="text-sm text-indigo-600 font-semibold">Medicina Humana</span>
-          </div>
-          <ul class="text-sm space-y-1 text-gray-700">
-            <li><strong>Ciudad:</strong> Lima</li>
-            <li><strong>Modalidad:</strong> Presencial</li>
-            <li><strong>Duración:</strong> 7 años</li>
-          </ul>
-          <button class="mt-6 w-full py-2 px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-semibold transition-all duration-300">Ver más</button>
-        </div>
+      
+      <!-- Botón de búsqueda -->
+      <div class="mt-6 text-center">
+        <button onclick="filtrarYRenderizar()" class="px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+          Buscar
+        </button>
       </div>
     </div>
-  </section>
+    
+    <!-- Resultados -->
+    <div id="resultadosBuscador" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+      <!-- Las cards se insertarán aquí dinámicamente -->
+    </div>
+  </div>
+</section>

@@ -55,9 +55,61 @@
   {% include 'sections/mapa.html' %}
   {% include 'sections/buscador.html' %}
 
+  <!-- Modal de Comparación -->
+  <div id="comparisonModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="min-h-screen px-4 text-center">
+      <div class="fixed inset-0" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
+      <div class="inline-block w-full max-w-4xl p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-gray-900" id="modalTitle">Comparación de Universidades</h3>
+          <button onclick="closeComparisonModal()" class="text-gray-400 hover:text-gray-500">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Gráfico de Duración -->
+          <div class="bg-white p-4 rounded-xl shadow-lg">
+            <h4 class="text-lg font-semibold mb-4 text-gray-800">Duración de la Carrera</h4>
+            <canvas id="durationChart" class="w-full h-64"></canvas>
+          </div>
+          
+          <!-- Gráfico de Ingresantes/Postulantes -->
+          <div class="bg-white p-4 rounded-xl shadow-lg">
+            <h4 class="text-lg font-semibold mb-4 text-gray-800">Ratio Ingresantes/Postulantes</h4>
+            <canvas id="ratioChart" class="w-full h-64"></canvas>
+          </div>
+          
+          <!-- Gráfico de Costo Anual -->
+          <div class="bg-white p-4 rounded-xl shadow-lg">
+            <h4 class="text-lg font-semibold mb-4 text-gray-800">Costo Anual</h4>
+            <canvas id="costChart" class="w-full h-64"></canvas>
+          </div>
+          
+          <!-- Información Adicional -->
+          <div class="bg-white p-4 rounded-xl shadow-lg">
+            <h4 class="text-lg font-semibold mb-4 text-gray-800">Detalles Adicionales</h4>
+            <div id="additionalInfo" class="space-y-3">
+              <!-- Se llenará dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts finales (¡en orden!) -->
   <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
   <script src="{{ url_for('static', filename='js/mapa.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/glider.min.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
   <script src="{{ url_for('static', filename='js/buscador.js') }}"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

@@ -176,5 +176,39 @@ def universidades_por_carrera():
         })
     return jsonify({"ciudades": ciudades})
 
+@app.route("/filtros_buscador", methods=["GET"])
+def filtros_buscador():
+    carreras = set()
+    ciudades = set()
+    tipos = set()
+    for lista in carreras_data.values():
+        for inst in lista:
+            carreras.add(inst.get("Carrera", "").strip())
+            ciudades.add(inst.get("Ciudad", "").strip())
+            tipos.add(inst.get("Tipo de institución", "").strip())
+    return jsonify({
+        "carreras": sorted(c for c in carreras if c),
+        "ciudades": sorted(c for c in ciudades if c),
+        "tipos": sorted(t for t in tipos if t)
+    })
+
+@app.route("/api/carreras_completas", methods=["GET"])
+def api_carreras_completas():
+    return jsonify(carreras_data)
+
+@app.route('/api/instituciones')
+def get_instituciones():
+    try:
+        with open('data/carreras.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        # Aplanar el JSON a una lista de opciones
+        instituciones = []
+        for lista in data.values():
+            for inst in lista:
+                instituciones.append(inst)
+        return jsonify(instituciones)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     app.run(debug=True)
