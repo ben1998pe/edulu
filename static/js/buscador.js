@@ -1,79 +1,90 @@
 let todasLasOpciones = [];
+let carrerasUnicas = [];
+let ciudadesUnicas = [];
 
-// Función para cargar los datos iniciales usando el método anterior
+// Función para cargar los datos iniciales
 async function cargarDatos() {
     try {
         const response = await fetch('/api/carreras_completas');
         const data = await response.json();
-        // Aplana el objeto a una lista
+        
         todasLasOpciones = [];
+        const tempCarreras = new Set();
+        const tempCiudades = new Set();
+
         Object.values(data).forEach(lista => {
-            lista.forEach(inst => todasLasOpciones.push(inst));
+            lista.forEach(inst => {
+                todasLasOpciones.push(inst);
+                if (inst["Carrera"]) tempCarreras.add(inst["Carrera"]);
+                if (inst["Ciudad"]) tempCiudades.add(inst["Ciudad"]);
+            });
         });
+
+        carrerasUnicas = Array.from(tempCarreras).sort();
+        ciudadesUnicas = Array.from(tempCiudades).sort();
+        
         console.log('Datos cargados:', todasLasOpciones.length, 'instituciones');
+        console.log('Carreras únicas cargadas:', carrerasUnicas.length);
+        console.log('Ciudades únicas cargadas:', ciudadesUnicas.length);
+
     } catch (error) {
         console.error('Error al cargar los datos:', error);
     }
 }
 
 // Cargar datos cuando el documento esté listo
-document.addEventListener('DOMContentLoaded', cargarDatos);
+document.addEventListener('DOMContentLoaded', () => {
+    cargarDatos();
 
-// Llenar filtros dinámicamente y agregar autocompletado
-window.addEventListener('DOMContentLoaded', async () => {
-  const inputCarrera = document.getElementById('filtro-carrera');
-  const inputCiudad = document.getElementById('filtro-ciudad');
-  const selectTipo = document.getElementById('filtro-tipo');
+    // Configurar autocompletado para Carrera
+    const carreraInput = document.getElementById('carreraInput');
+    const sugerenciasCarrera = document.getElementById('sugerenciasCarrera');
+    setupAutocomplete(carreraInput, sugerenciasCarrera, () => carrerasUnicas);
 
-  try {
-    const res = await fetch('/filtros_buscador');
-    const data = await res.json();
-    // Autocompletado para carrera
-    if (inputCarrera && data.carreras) {
-      inputCarrera.addEventListener('input', function() {
-        mostrarSugerencias(inputCarrera, data.carreras);
-      });
-    }
-    // Autocompletado para ciudad
-    if (inputCiudad && data.ciudades) {
-      inputCiudad.addEventListener('input', function() {
-        mostrarSugerencias(inputCiudad, data.ciudades);
-      });
-    }
-    // Llenar select de tipo
-    if (selectTipo && data.tipos) {
-      selectTipo.innerHTML = '<option value="">Todos</option>';
-      data.tipos.forEach(tipo => {
-        const opt = document.createElement('option');
-        opt.value = tipo;
-        opt.textContent = tipo;
-        selectTipo.appendChild(opt);
-      });
-    }
-    // Filtrar solo al hacer clic en el botón Buscar
-    const btnBuscar = document.getElementById('btn-buscar');
-    if (btnBuscar) btnBuscar.addEventListener('click', filtrarYRenderizar);
-  } catch (e) {
-    // Error al cargar filtros
-  }
+    // Configurar autocompletado para Ciudad
+    const ciudadInput = document.getElementById('ciudadInput');
+    const sugerenciasCiudad = document.getElementById('sugerenciasCiudad');
+    setupAutocomplete(ciudadInput, sugerenciasCiudad, () => ciudadesUnicas);
 });
 
-// Autocompletado simple (sugerencias debajo del input)
-function mostrarSugerencias(input, lista) {
-  let datalist = input.nextElementSibling;
-  if (!datalist || datalist.tagName !== 'DATALIST') {
-    datalist = document.createElement('datalist');
-    datalist.id = input.id + '-datalist';
-    input.setAttribute('list', datalist.id);
-    input.parentNode.insertBefore(datalist, input.nextSibling);
-  }
-  datalist.innerHTML = '';
-  const val = input.value.toLowerCase();
-  lista.filter(item => item.toLowerCase().includes(val)).slice(0, 10).forEach(item => {
-    const option = document.createElement('option');
-    option.value = item;
-    datalist.appendChild(option);
-  });
+function setupAutocomplete(inputElement, suggestionsContainer, getSuggestionsData) {
+    inputElement.addEventListener('input', () => {
+        const query = inputElement.value.toLowerCase();
+        suggestionsContainer.innerHTML = '';
+
+        if (query.length < 2) {
+            suggestionsContainer.classList.add('hidden');
+            return;
+        }
+
+        const allSuggestions = getSuggestionsData();
+        const filteredSuggestions = allSuggestions.filter(item => 
+            item.toLowerCase().includes(query)
+        ).slice(0, 10); // Limitar a 10 sugerencias
+
+        if (filteredSuggestions.length > 0) {
+            filteredSuggestions.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.classList.add('p-2', 'cursor-pointer', 'hover:bg-indigo-100', 'rounded-md');
+                div.textContent = suggestion;
+                div.addEventListener('click', () => {
+                    inputElement.value = suggestion;
+                    suggestionsContainer.classList.add('hidden');
+                });
+                suggestionsContainer.appendChild(div);
+            });
+            suggestionsContainer.classList.remove('hidden');
+        } else {
+            suggestionsContainer.classList.add('hidden');
+        }
+    });
+
+    inputElement.addEventListener('blur', () => {
+        // Retrasar el ocultamiento para permitir clic en sugerencia
+        setTimeout(() => {
+            suggestionsContainer.classList.add('hidden');
+        }, 200);
+    });
 }
 
 function filtrarYRenderizar() {
@@ -89,8 +100,8 @@ function filtrarYRenderizar() {
     console.log('Filtrando con:', { carrera, ciudad, tipo });
 
     const resultados = todasLasOpciones.filter(inst => {
-        const matchCarrera = !carrera || inst["Carrera"].toLowerCase().includes(carrera);
-        const matchCiudad = !ciudad || inst["Ciudad"].toLowerCase().includes(ciudad);
+        const matchCarrera = !carrera || (inst["Carrera"] && inst["Carrera"].toLowerCase().includes(carrera));
+        const matchCiudad = !ciudad || (inst["Ciudad"] && inst["Ciudad"].toLowerCase().includes(ciudad));
         const matchTipo = !tipo || inst["Tipo de institución"] === tipo;
         return matchCarrera && matchCiudad && matchTipo;
     });
