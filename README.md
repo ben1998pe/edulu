@@ -1,2 +1,2 @@
 # edulu
-Proyecto personal edulu 
+Proyecto personal edulu v1
