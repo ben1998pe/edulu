@@ -2,6 +2,11 @@ let todasLasOpciones = [];
 let carrerasUnicas = [];
 let ciudadesUnicas = [];
 
+// Variables para paginación
+let paginaActual = 1;
+let resultadosPaginados = [];
+const CARDS_POR_PAGINA = 10;
+
 // Función para cargar los datos iniciales
 async function cargarDatos() {
     try {
@@ -22,6 +27,9 @@ async function cargarDatos() {
 
         carrerasUnicas = Array.from(tempCarreras).sort();
         ciudadesUnicas = Array.from(tempCiudades).sort();
+        
+        // Exponer globalmente para comparison.js
+        window.instituciones = todasLasOpciones;
         
         console.log('Datos cargados:', todasLasOpciones.length, 'instituciones');
         console.log('Carreras únicas cargadas:', carrerasUnicas.length);
@@ -87,6 +95,41 @@ function setupAutocomplete(inputElement, suggestionsContainer, getSuggestionsDat
     });
 }
 
+function renderPaginador(totalPaginas) {
+    const paginador = document.getElementById('paginadorBuscador');
+    if (!paginador) return;
+    paginador.innerHTML = '';
+    if (totalPaginas <= 1) return;
+    for (let i = 1; i <= totalPaginas; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = 'px-3 py-1 rounded-lg font-semibold border border-indigo-200 bg-white shadow text-indigo-600 hover:bg-indigo-100 transition ' + (i === paginaActual ? 'bg-indigo-600 text-white' : '');
+        btn.addEventListener('click', () => {
+            paginaActual = i;
+            renderResultadosPaginados();
+        });
+        paginador.appendChild(btn);
+    }
+}
+
+function renderResultadosPaginados() {
+    const contenedor = document.getElementById('resultadosBuscador');
+    if (!contenedor) return;
+    contenedor.innerHTML = '';
+    if (resultadosPaginados.length === 0) {
+        contenedor.innerHTML = `<div class="text-center py-8"><p class="text-gray-600">No se encontraron resultados</p></div>`;
+        renderPaginador(1);
+        return;
+    }
+    const totalPaginas = Math.ceil(resultadosPaginados.length / CARDS_POR_PAGINA);
+    const inicio = (paginaActual - 1) * CARDS_POR_PAGINA;
+    const fin = inicio + CARDS_POR_PAGINA;
+    resultadosPaginados.slice(inicio, fin).forEach(inst => {
+        contenedor.appendChild(createCard(inst));
+    });
+    renderPaginador(totalPaginas);
+}
+
 function filtrarYRenderizar() {
     if (!todasLasOpciones || todasLasOpciones.length === 0) {
         console.error('No hay datos disponibles para filtrar');
@@ -108,26 +151,10 @@ function filtrarYRenderizar() {
 
     console.log('Resultados encontrados:', resultados.length);
 
-    const contenedor = document.getElementById('resultadosBuscador');
-    if (!contenedor) {
-        console.error('No se encontró el contenedor de resultados');
-        return;
-    }
-
-    contenedor.innerHTML = '';
-    
-    if (resultados.length === 0) {
-        contenedor.innerHTML = `
-            <div class="text-center py-8">
-                <p class="text-gray-600">No se encontraron resultados</p>
-            </div>
-        `;
-        return;
-    }
-
-    resultados.forEach(inst => {
-        contenedor.appendChild(createCard(inst));
-    });
+    // Guardar resultados y resetear página
+    resultadosPaginados = resultados;
+    paginaActual = 1;
+    renderResultadosPaginados();
 }
 
 function createCard(inst) {

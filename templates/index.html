@@ -50,6 +50,39 @@
 </head>
 <body class="overflow-x-hidden bg-[#f4f4f8] text-gray-900">
 
+  <!-- Toggle Dark Mode -->
+  <button id="toggleDarkMode" title="Cambiar modo claro/oscuro" class="fixed top-6 right-6 z-50 bg-white border border-gray-200 shadow-lg rounded-full p-3 flex items-center justify-center transition hover:bg-gray-100">
+    <svg id="iconSun" class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 7.07l-1.41-1.41M6.34 6.34L4.93 4.93m12.02 0l-1.41 1.41M6.34 17.66l-1.41 1.41"/></svg>
+    <svg id="iconMoon" class="w-6 h-6 text-gray-700 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
+  </button>
+  <script>
+    // Dark mode toggle logic
+    function setDarkMode(enabled) {
+      if (enabled) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('modoOscuro', '1');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('modoOscuro', '0');
+      }
+    }
+    // Al cargar, aplicar preferencia
+    (function() {
+      const preferencia = localStorage.getItem('modoOscuro');
+      if (preferencia === '1' || (!preferencia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        setDarkMode(true);
+      } else {
+        setDarkMode(false);
+      }
+    })();
+    // Toggle al hacer click
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('toggleDarkMode').addEventListener('click', function() {
+        setDarkMode(!document.documentElement.classList.contains('dark'));
+      });
+    });
+  </script>
+
   <!-- Secciones inyectadas -->
   {% include 'sections/chat.html' %}
   {% include 'sections/mapa.html' %}
@@ -76,19 +109,19 @@
           <!-- Gráfico de Duración -->
           <div class="bg-white p-4 rounded-xl shadow-lg">
             <h4 class="text-lg font-semibold mb-4 text-gray-800">Duración de la Carrera</h4>
-            <canvas id="durationChart" class="w-full h-64"></canvas>
+            <div style="overflow-x:auto;"><canvas id="durationChart" class="chart-canvas w-full h-64 min-w-[600px]"></canvas></div>
           </div>
           
           <!-- Gráfico de Ingresantes/Postulantes -->
           <div class="bg-white p-4 rounded-xl shadow-lg">
             <h4 class="text-lg font-semibold mb-4 text-gray-800">Ratio Ingresantes/Postulantes</h4>
-            <canvas id="ratioChart" class="w-full h-64"></canvas>
+            <div style="overflow-x:auto;"><canvas id="ratioChart" class="chart-canvas w-full h-64 min-w-[600px]"></canvas></div>
           </div>
           
           <!-- Gráfico de Costo Anual -->
           <div class="bg-white p-4 rounded-xl shadow-lg">
             <h4 class="text-lg font-semibold mb-4 text-gray-800">Costo Anual</h4>
-            <canvas id="costChart" class="w-full h-64"></canvas>
+            <div style="overflow-x:auto;"><canvas id="costChart" class="chart-canvas w-full h-64 min-w-[600px]"></canvas></div>
           </div>
           
           <!-- Información Adicional -->
