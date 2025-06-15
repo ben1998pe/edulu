@@ -58,7 +58,12 @@ document.addEventListener("DOMContentLoaded", function () {
           chatExpandable.classList.add('expanded');
         }
       } else {
-        eduluSpan.innerText = `⚠️ Error: ${data.error || "No se pudo obtener respuesta."}`;
+        // Si no hay respuesta específica, verificar si el mensaje no contiene carrera o ciudad
+        if (!mensaje.toLowerCase().includes('carrera') && !mensaje.toLowerCase().includes('ciudad')) {
+          eduluSpan.innerText = "Hola! Por favor, menciona una carrera o ciudad para que pueda ayudarte mejor.";
+        } else {
+          eduluSpan.innerText = `⚠️ Error: ${data.error || "No se pudo obtener respuesta de la IA."}`;
+        }
       }
     } catch (err) {
       eduluSpan.innerText = "⚠️ Error de red.";

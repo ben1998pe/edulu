@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import requests
 import json
 import unicodedata
+import re
 
 app = Flask(__name__)
 
@@ -87,6 +88,7 @@ def recomendar():
         mensaje = data.get("mensaje", "")
         print("Mensaje del usuario:", mensaje)
 
+        # Eliminar la condición que revisa 'carrera' y 'ciudad' en el mensaje
         prompt = (
             f"Extrae la carrera y ciudad del siguiente mensaje de forma JSON clara:\n"
             f"\"{mensaje}\"\n"
@@ -104,7 +106,15 @@ def recomendar():
         print("🔍 Respuesta cruda de extracción:\n", json.dumps(raw, indent=2))
 
         content = raw["choices"][0]["message"]["content"]
-        parsed = json.loads(content)
+        # Buscar el primer bloque JSON en la respuesta
+        match = re.search(r'\{[\s\S]*?\}', content)
+        if match:
+            try:
+                parsed = json.loads(match.group(0))
+            except Exception:
+                return jsonify({"respuesta": "Hola! Por favor, menciona una carrera o ciudad para que pueda ayudarte mejor."})
+        else:
+            return jsonify({"respuesta": "Hola! Por favor, menciona una carrera o ciudad para que pueda ayudarte mejor."})
 
         carrera = normalizar(parsed.get("carrera", ""))
         ciudad_usuario = normalizar(parsed.get("ciudad", ""))
@@ -121,7 +131,7 @@ def recomendar():
                         resultados.append(inst)
 
         if not resultados:
-            return jsonify({"respuesta": f"No se encontraron resultados para {parsed['carrera']} en {parsed['ciudad']}. Intenta con otra carrera o ciudad."})
+            return jsonify({"respuesta": f"No se encontraron resultados para {parsed.get('carrera','')} en {parsed.get('ciudad','')}. Intenta con otra carrera o ciudad."})
 
         respuesta = f"Basado en tu interés en la carrera de {parsed['carrera']} y en estudiar en {parsed['ciudad']}, te recomiendo las siguientes opciones:\n"
         for i, r in enumerate(resultados[:3], start=1):

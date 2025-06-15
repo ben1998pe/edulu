@@ -100,16 +100,40 @@ function renderPaginador(totalPaginas) {
     if (!paginador) return;
     paginador.innerHTML = '';
     if (totalPaginas <= 1) return;
-    for (let i = 1; i <= totalPaginas; i++) {
+    const crearBtn = (i, texto = null, disabled = false) => {
         const btn = document.createElement('button');
-        btn.textContent = i;
+        btn.textContent = texto || i;
+        btn.disabled = disabled;
         btn.className = 'px-3 py-1 rounded-lg font-semibold border border-indigo-200 bg-white shadow text-indigo-600 hover:bg-indigo-100 transition ' + (i === paginaActual ? 'bg-indigo-600 text-white' : '');
-        btn.addEventListener('click', () => {
-            paginaActual = i;
-            renderResultadosPaginados();
-        });
+        if (!disabled && texto !== '...') {
+            btn.addEventListener('click', () => {
+                paginaActual = i;
+                renderResultadosPaginados();
+            });
+        } else if (texto === '...') {
+            btn.className += ' cursor-default';
+        }
         paginador.appendChild(btn);
+    };
+    let mostrar = [];
+    if (totalPaginas <= 7) {
+        for (let i = 1; i <= totalPaginas; i++) mostrar.push(i);
+    } else {
+        mostrar = [1];
+        if (paginaActual > 4) mostrar.push('...');
+        for (let i = Math.max(2, paginaActual - 2); i <= Math.min(totalPaginas - 1, paginaActual + 2); i++) {
+            mostrar.push(i);
+        }
+        if (paginaActual < totalPaginas - 3) mostrar.push('...');
+        mostrar.push(totalPaginas);
     }
+    mostrar.forEach(i => {
+        if (i === '...') {
+            crearBtn(null, '...', true);
+        } else {
+            crearBtn(i);
+        }
+    });
 }
 
 function renderResultadosPaginados() {
