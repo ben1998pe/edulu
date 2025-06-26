@@ -1,4 +1,4 @@
 # edulu
-Proyecto personal edulu v1
+Proyecto personal edulu
 # Author
 Benjamin Oscco Arias
